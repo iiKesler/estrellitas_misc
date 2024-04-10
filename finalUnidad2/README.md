@@ -78,3 +78,6 @@ First we must try to emulate how only one of the variables would work on the con
 It's also a good way to check the led is always working.
 
 Firstly an array will be made, it'll have all the possible values of the variable, in this case 0 thru 10
+
+
+
