@@ -1,8 +1,8 @@
-#Documentación
+# Documentación
 
 Esta documentación hace referencia al testVariablesMicro.ino de la carpeta actual
 
-##Definición de las variables
+## Definición de las variables
 
 Empezamos definiendo las 3 variables que vamos a implementar en el microcontrolador, establecimos las siguientes:
 
