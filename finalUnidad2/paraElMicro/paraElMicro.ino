@@ -4,11 +4,12 @@ void task()
     {
         INIT,
         WAIT_INIT,
-        SEND_EVENT
+        SEND_EVENT,
+        VARIABLE_CHANGE
     };
     static TaskStates taskState = TaskStates::INIT;
-    static uint32_t previous = 0;
-    static uint32_t toPrint = 3;
+    uint32_t volumen[] ={0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20};
+    static uint32_t toPrint = 0;
     static uint32_t previousTime = 0;
     static bool ledState = true;
   
@@ -30,33 +31,36 @@ void task()
         }
         case TaskStates::WAIT_INIT:
         {
-            if (Serial.available() > 0)
+          if (Serial.available()>0)
+          {
+            const char c = Serial.read();
+            if (c == 's')
             {
-                if (Serial.read() == '1')
-                {
-                    previous = 0; // Force to send the first value immediately
-                    taskState = TaskStates::SEND_EVENT;
-                }
+              taskState = TaskStates::VARIABLE_CHANGE;
             }
+          }          
             break;
+        }
+        case TaskStates::VARIABLE_CHANGE:
+        {
+          if (Serial.available() > 0)
+            {
+              for(int i = 0; i < 21; i++)
+              {
+                if (Serial.read() == i)
+                {
+                  toPrint=volumen[i];
+                  taskState = TaskStates::SEND_EVENT;
+                }                
+              } 
+            }                  
+          break;
         }
         case TaskStates::SEND_EVENT:
         {
-            uint32_t current = millis();
-            if ((current - previous) > 3000)
-            {
-                previous = current;
-                Serial.print(toPrint);
-                toPrint=toPrint+3;
-            }
-            if (Serial.available() > 0)
-            {
-                if (Serial.read() == '2')
-                {
-                    taskState = TaskStates::WAIT_INIT;
-                }
-            }
-            break;
+          Serial.println("Volumen: ");
+          Serial.println(toPrint);            
+          break;
         }
         default:
         {

@@ -19,6 +19,25 @@
 4. Be creative and have a god aesthetic.
 
 
+## Project overview:
+
+We're trying to incorporate the necessary parts asked in a music player
+
+Our three variables are:
+
+Song (number in a playlist)
+
+Volume (from 0 to 20)
+
+Minute (Where is the song right now in a 3:50 minute long song)
+
+Our initial design of it's interface is this:
+
+![alt text](IMG_6187(2).PNG)
+
+More on the interface can be read about below in it's own section
+
+
 ## status diagram:
 
 This was the first idea for a status diagram we thought of:
@@ -37,3 +56,12 @@ This design is subject to change
 
 
 ## Microcontroller:
+
+The start of the project is actually here, we must first try to make this project work
+
+First we must try to emulate how only one of the variables would work on the controller.
+
+It's also a good way to check the led is always working.
+
+Firstly an array will be made, it'll have all the possible values of the variable, in this case 0 thru 20
+
