@@ -38,6 +38,13 @@ Our initial design of it's interface is this:
 More on the interface can be read about below in it's own section
 
 
+An idea thrown around in the team, that the speed of the song and volume variable work as frequency, aka how many songs/volume levels will be skipped the next time a change happens, and this change will happen only when the time slider gets to 3 minutes
+
+the slider will change either by frequency or speed between selected time stamps
+
+the time slider, will have key points and it will be thru those points that the skips will happen, wether it's by how many keypoints will skip, or in how many seconds the skip will happen
+
+
 ## status diagram:
 
 This was the first idea for a status diagram we thought of:
@@ -64,4 +71,3 @@ First we must try to emulate how only one of the variables would work on the con
 It's also a good way to check the led is always working.
 
 Firstly an array will be made, it'll have all the possible values of the variable, in this case 0 thru 20
-

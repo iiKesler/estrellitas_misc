@@ -38,10 +38,12 @@ void task()
         case TaskStates::VARIABLE_CHANGE:
         {
           Serial.println("escriba un numero entre 0 y 20");
-          do{
+          while(sigue==false){
+            
           if (Serial.available() > 0)
             {
-              if(Serial.read()> 20 | Serial.read()< 0)
+              uint32_t input = Serial.parseInt();
+              if(input < 0 || input > 20)
               {
                 Serial.println("debe estar entre 0 y 20");
               }
@@ -49,7 +51,7 @@ void task()
               {
               for(int i = 0; i < 21; i++)
               {
-                if (Serial.read() == i)
+                if (input == i)
                 {
                   toPrint=volumen[i];
                   Serial.println("si dio");
@@ -59,13 +61,15 @@ void task()
               } 
               }
             }  
-          }while(sigue==false);                
+          }                
           break;
         }
         case TaskStates::SEND_EVENT:
         {
           Serial.println("Volumen: ");
-          Serial.println(toPrint);            
+          Serial.println(toPrint);
+           sigue=false;
+          taskState = TaskStates::VARIABLE_CHANGE;
           break;
         }
         default:
@@ -82,8 +86,7 @@ void setup()
 }
 
 void loop()
-{
-  
+{   
   static bool ledState = true;
   uint32_t currentTime = millis();
   static uint32_t previousTime = 0;
@@ -93,6 +96,5 @@ void loop()
     ledState = !ledState;
     digitalWrite(LED_BUILTIN, ledState);
   }
-  
-    task();
+  task();
 }
