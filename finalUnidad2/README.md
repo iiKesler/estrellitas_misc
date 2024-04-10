@@ -46,7 +46,7 @@ the time slider, will have key points and it will be thru those points that the 
 
 The keypoints and exact values of each variable have been decided and they will be:
 
-Volume: 1-10. they're all int
+Volume: 0-10. they're all int, 0 is mute
 Songs: 1-10. they're all int
 TimeStamps: the songs will all last 2 minutes: 0:00, 0:30, 1:00, 1:30, 2:00.
 
