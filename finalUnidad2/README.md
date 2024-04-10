@@ -42,7 +42,14 @@ An idea thrown around in the team, that the speed of the song and volume variabl
 
 the slider will change either by frequency or speed between selected time stamps
 
-the time slider, will have key points and it will be thru those points that the skips will happen, wether it's by how many keypoints will skip, or in how many seconds the skip will happen
+the time slider, will have key points and it will be thru those points that the skips will happen, wether it's by how many keypoints will skip, or in how many seconds the skip will happen.
+
+The keypoints and exact values of each variable have been decided and they will be:
+
+Volume: 1-10. they're all int
+Songs: 1-10. they're all int
+TimeStamps: the songs will all last 2 minutes: 0:00, 0:30, 1:00, 1:30, 2:00.
+
 
 
 ## status diagram:
@@ -70,4 +77,4 @@ First we must try to emulate how only one of the variables would work on the con
 
 It's also a good way to check the led is always working.
 
-Firstly an array will be made, it'll have all the possible values of the variable, in this case 0 thru 20
+Firstly an array will be made, it'll have all the possible values of the variable, in this case 0 thru 10
