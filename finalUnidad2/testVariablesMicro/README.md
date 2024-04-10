@@ -9,14 +9,25 @@ Empezamos definiendo las 3 variables que vamos a implementar en el microcontrola
 - Volumen: es un valor numerico que vaya desde 0 a 10, donde 0 es silencio y 10 es el max volumen
 - Pista actual: representa la pista actual del reproductor con un numero entero dentro de la lista de reproduccion
 - Duracion de la cancion: un valor en segundos que refleje la duracion de la pista actual
+- velocidad de reproduccion: x1 x2 x3 la aceleracion del tiempo
+- orden de reproduccion: reproduzca cada 1 pista cada 2 pistas cada 3pistas o asi
 
 El micro debe encender el LED a 1 hz cada 500 milisegundos (0.5 segundos) para visualizar fisicamente que no se bloquee
 
 Desde Unity debe haber comunicacion con el controlador para cambiar los parametros iniciales y en tiempo real de las variables mediante elementos interactivos en la interfaz grafica
 
-La estructura para el codigo del microcontrolador estructurada de la siguiente manera
+---
 
-```c
+La estructura para el codigo del microcontrolador organizada de la siguiente manera, estableciendo el parpadeo del LED y que espere los comandos para establecer el valor de las variables
+ejemplo:
+
+para el volumen: V (1-10)
+para la duracion: D (1-infinitos segundos)
+para la pista actual: P (1-10)
+
+Si 
+
+```cpp
 #include <Arduino.h>
 
 // Definición de las variables
