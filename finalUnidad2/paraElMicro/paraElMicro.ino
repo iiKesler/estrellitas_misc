@@ -1,100 +1,177 @@
-void task()
-{
-    enum class TaskStates
-    {
-        INIT,
-        WAIT_INIT,
-        SEND_EVENT,
-        VARIABLE_CHANGE
-    };
-    static TaskStates taskState = TaskStates::INIT;
-    uint32_t volumen[] ={0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20};
-    static uint32_t toPrint = 0;
-    static bool sigue = false;
-  
-    
+enum State {
+    STATE_SETUP,
+    STATE_SELECT_TRACK,
+    STATE_SELECT_VOLUME,
+    STATE_PLAYING
+};
+State currentState = STATE_SETUP;
 
-    switch (taskState)
-    {
-        case TaskStates::INIT:
-        {
-            Serial.begin(115200);
-            taskState = TaskStates::WAIT_INIT;
-            break;
-        }
-        case TaskStates::WAIT_INIT:
-        {
-          if (Serial.available()>0)
-          {
-            const char c = Serial.read();
-            if (c == 's')
-            {
-              Serial.println("dijo si");
-              taskState = TaskStates::VARIABLE_CHANGE;
-            }
-          }          
-            break;
-        }
-        case TaskStates::VARIABLE_CHANGE:
-        {
-          Serial.println("escriba un numero entre 0 y 20");
-          while(sigue==false){
-            
-          if (Serial.available() > 0)
-            {
-              uint32_t input = Serial.parseInt();
-              if(input < 0 || input > 20)
-              {
-                Serial.println("debe estar entre 0 y 20");
-              }
-              else
-              {
-              for(int i = 0; i < 21; i++)
-              {
-                if (input == i)
-                {
-                  toPrint=volumen[i];
-                  Serial.println("si dio");
-                  sigue=true;
-                  taskState = TaskStates::SEND_EVENT;
-                }                
-              } 
-              }
-            }  
-          }                
-          break;
-        }
-        case TaskStates::SEND_EVENT:
-        {
-          Serial.println("Volumen: ");
-          Serial.println(toPrint);
-           sigue=false;
-          taskState = TaskStates::VARIABLE_CHANGE;
-          break;
-        }
-        default:
-        {
-            break;
+//Variables
+uint32_t volume = 0; // 0 is mute
+uint32_t volumeMax = 10;
+uint32_t trackDuration = 0;
+uint32_t currentTrack = 1;
+uint32_t maxTrack = 10;
+uint32_t previousTime = 0;
+
+uint32_t trackJump = 1;
+uint32_t volumeJump = 1;
+
+bool ledState = false;
+
+void setupState () {
+    Serial.begin (115200);
+    pinMode (LED_BUILTIN, OUTPUT);
+    currentState = STATE_SELECT_TRACK;
+}
+
+void selectTrackState () {
+    Serial.println ("Please select a track (1-10)");
+    while (Serial.available() == 0) {}
+    uint32_t selectedTrack = Serial.parseInt();
+    if (selectedTrack >= 1 && selectedTrack <= maxTrack) {
+        currentTrack = selectedTrack;
+        Serial.println ("Now playing " + String (currentTrack));
+        currentState = STATE_SELECT_VOLUME;
+    } else {
+        Serial.println ("Invalid track number, defaulting to track 1");
+        currentTrack = 1;
+        currentState = STATE_SELECT_VOLUME;
+    }
+}
+
+void selectVolumeState () {
+    Serial.println ("Please select a volume (0-10)");
+    while (Serial.available() == 0) {}
+    uint32_t selectedVolume = Serial.parseInt();
+    if (selectedVolume >= 0 && selectedVolume <= volumeMax) {
+        volume = selectedVolume;
+        Serial.println ("Volume set to " + String (volume));
+        currentState = STATE_PLAYING;
+    } else {
+        Serial.println ("Invalid volume value, defaulting to volume 0 (mute)");
+        volume = 0;
+        currentState = STATE_PLAYING;
+    }
+}
+
+void task1() {
+    if (Serial.available() > 0) {
+        char command = Serial.read();
+
+        switch (command) {
+            uint32_t newVolume;
+            case 'V':
+                newVolume = Serial.parseInt();
+                if (Serial.available() >= 1) {
+                    if (newVolume <= volumeMax) {
+                        volume = newVolume;
+                        Serial.println("Volume set to " + String(volume));
+                    } else {
+                        Serial.println("Invalid volume value");
+                    }
+                }
+                break;
+            case 'D':
+                if (Serial.available() >= 1) {
+                    uint32_t newDuration = Serial.parseInt();
+                    if (newDuration >= 0 && newDuration <= 180) {
+                        trackDuration = newDuration;
+                        Serial.println("Track duration set to " + String(trackDuration) + " seconds");
+                    } else {
+                        Serial.println("Invalid duration value");
+                    }
+                }
+                break;
+            case 'P':
+                if (Serial.available() >= 1) {
+                    uint32_t newTrack = Serial.parseInt();
+                    if (newTrack >= 1 && newTrack <= maxTrack) {
+                        if (newTrack == currentTrack && newTrack != maxTrack) {
+                            trackDuration = 10;
+                            Serial.println("Playing track " + String(currentTrack));
+                        } else {
+                            currentTrack = newTrack;
+                            Serial.println ("Playing track " + String(currentTrack));
+                        }
+                    } else {
+                        Serial.println("Invalid track number");
+                    }
+                }
+                break;
+            default:
+                Serial.println("Invalid command");
+                break;
         }
     }
 }
 
-void setup()
-{
-  pinMode(LED_BUILTIN, OUTPUT);
-    task();
+void task2 () {
+    task1 ();
+    if (trackDuration > 0) {
+        trackDuration--;
+        Serial.println ("Track duration: " + String (trackDuration) + " seconds");
+    }
+    delay (1000);
+
+    // Change volume and track by 1 when the track ends
+    if (trackDuration == 0) {
+        if (currentTrack < maxTrack) {
+            currentTrack += trackJump;
+            if (currentTrack > maxTrack) {
+                currentTrack = maxTrack;
+            }
+            Serial.println ("Playing track " + String (currentTrack));
+        } else {
+            currentTrack = 1;
+            Serial.println ("Playing track " + String (currentTrack));
+        }
+        if (volume < volumeMax) {
+            volume += volumeJump;
+            if (volume > volumeMax) {
+                volume = volumeMax;
+            }
+            Serial.println ("Volume set to " + String (volume));
+        } else {
+            volume = 1;
+            Serial.println ("Volume set to " + String (volume));
+        }
+        trackDuration = 10;
+    }
 }
 
-void loop()
-{   
-  static bool ledState = true;
-  uint32_t currentTime = millis();
-  static uint32_t previousTime = 0;
+void playingState () {
+    task2 ();
 
-  if( (currentTime - previousTime) > 100){
-    previousTime = currentTime;
-    ledState = !ledState;
-    digitalWrite(LED_BUILTIN, ledState);
-  }
-  task();
+    uint32_t currentTime = millis();
+    if (currentTime - previousTime >= 500) {
+        previousTime = currentTime;
+        ledState = !ledState;
+        digitalWrite (LED_BUILTIN, ledState);
+    }
+}
+
+void setup() {
+
+}
+
+void loop() {
+    switch (currentState) {
+        case STATE_SETUP:
+            Serial.println ("Setup");
+            setupState ();
+            break;
+        case STATE_SELECT_TRACK:
+            Serial.println ("Select track");
+            selectTrackState ();
+            break;
+        case STATE_SELECT_VOLUME:
+            Serial.println ("Select volume");
+            selectVolumeState ();
+            break;
+        case STATE_PLAYING:
+            Serial.println ("Playing");
+            playingState ();
+            break;
+    }
 }
